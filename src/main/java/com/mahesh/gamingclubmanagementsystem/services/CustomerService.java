@@ -20,7 +20,20 @@ public class CustomerService {
         Customer customer = new Customer();
 
         customer.setName(customerDTO.getName());
+
         customer.setMobileNumber(customerDTO.getMobileNumber());
+
+        List<Customer> existingCustomer =
+                customerRepository.findByMobileNumber(
+                        customerDTO.getMobileNumber()
+                );
+
+        if (!existingCustomer.isEmpty()) {
+
+            throw new RuntimeException(
+                    "Mobile number already exists"
+            );
+        }
 
         return customerRepository.save(customer);
     }
