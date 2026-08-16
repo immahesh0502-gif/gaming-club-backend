@@ -14,7 +14,7 @@ import com.mahesh.gamingclubmanagementsystem.enums.ResourceType;
 import com.mahesh.gamingclubmanagementsystem.dto.PaymentRequest;
 import com.mahesh.gamingclubmanagementsystem.dto.SessionDashboardDTO;
 import com.mahesh.gamingclubmanagementsystem.entity.BusinessDay;
-
+import java.time.temporal.ChronoUnit;
 import java.time.LocalDateTime;
 
 import java.util.List;
@@ -106,8 +106,8 @@ public class GameSessionService {
                 .between(session.getStartTime(), session.getEndTime())
                 .toMinutes();
 
-        if (minutes == 0) {
-            minutes = 1;
+        if (minutes < 0) {
+            throw new RuntimeException("Invalid session duration");
         }
         System.out.println("Minutes Played : " + minutes);
         GameResource resource = session.getResource();
@@ -116,14 +116,24 @@ public class GameSessionService {
 
         if (resource.getType() == ResourceType.TABLE) {
 
-            int hour = session.getStartTime().getHour();
+            LocalDateTime currentTime = session.getStartTime();
 
-            if (hour >= 10 && hour < 22) {
-                amount = minutes * resource.getDayRate();
-            } else {
-                amount = minutes * resource.getNightRate();
+            for (int i = 0; i < minutes; i++) {
+
+                int hour = currentTime.getHour();
+
+                if (hour >= 10 && hour < 22) {
+
+                    amount += resource.getDayRate();
+
+                } else {
+
+                    amount += resource.getNightRate();
+
+                }
+
+                currentTime = currentTime.plusMinutes(1);
             }
-
         }
         else if (resource.getType() == ResourceType.PS5) {
 

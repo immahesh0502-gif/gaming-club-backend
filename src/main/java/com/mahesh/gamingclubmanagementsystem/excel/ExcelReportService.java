@@ -129,8 +129,11 @@ public class ExcelReportService {
             );
 
             row.createCell(8).setCellValue(
-                    session.getPaymentMethod().toString()
+                    session.getPaymentMethod() == null
+                            ? "N/A"
+                            : session.getPaymentMethod().toString()
             );
+
 
         }
 
