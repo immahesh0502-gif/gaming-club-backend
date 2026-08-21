@@ -11,7 +11,7 @@ import java.util.List;
 import com.mahesh.gamingclubmanagementsystem.dto.PaymentRequest;
 
 @RestController
-@RequestMapping("/sessions")
+@RequestMapping("/api/sessions")
 public class GameSessionController {
 
     @Autowired

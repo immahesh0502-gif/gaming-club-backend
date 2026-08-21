@@ -6,7 +6,7 @@
     import com.mahesh.gamingclubmanagementsystem.dto.BusinessDayCloseResponse;
 
     @RestController
-    @RequestMapping("/business-day")
+    @RequestMapping("/api/business-day")
     @CrossOrigin(origins = "*")
     public class BusinessDayController {
 

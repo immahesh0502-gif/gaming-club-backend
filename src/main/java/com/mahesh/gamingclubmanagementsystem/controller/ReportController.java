@@ -14,7 +14,7 @@ import com.mahesh.gamingclubmanagementsystem.excel.ExcelReportService;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/reports")
+@RequestMapping("/api/reports")
 @CrossOrigin("*")
 public class ReportController {
 
