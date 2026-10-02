@@ -8,6 +8,11 @@ public class PaymentRequest {
 
     private PaymentMethod paymentMethod;
 
+    private Double cashAmount;
+
+    private Double upiAmount;
+
+
     public Long getSessionId() {
         return sessionId;
     }
@@ -16,11 +21,30 @@ public class PaymentRequest {
         this.sessionId = sessionId;
     }
 
+
     public PaymentMethod getPaymentMethod() {
         return paymentMethod;
     }
 
     public void setPaymentMethod(PaymentMethod paymentMethod) {
         this.paymentMethod = paymentMethod;
+    }
+
+
+    public Double getCashAmount() {
+        return cashAmount;
+    }
+
+    public void setCashAmount(Double cashAmount) {
+        this.cashAmount = cashAmount;
+    }
+
+
+    public Double getUpiAmount() {
+        return upiAmount;
+    }
+
+    public void setUpiAmount(Double upiAmount) {
+        this.upiAmount = upiAmount;
     }
 }

@@ -17,6 +17,7 @@ public class ReportService {
     @Autowired
     private GameSessionRepository gameSessionRepository;
 
+
     @Autowired
     private BusinessDayService businessDayService;
 
@@ -64,8 +65,7 @@ public class ReportService {
                 continue;
             }
 
-            if ("COMPLETED".equals(session.getStatus())
-                    || "PAYMENT_PENDING".equals(session.getStatus())) {
+            if ("COMPLETED".equals(session.getStatus())) {
 
                 todaySessions++;
 
@@ -87,6 +87,15 @@ public class ReportService {
 
                     todayCardRevenue += amount;
 
+                } else if (session.getPaymentMethod() == PaymentMethod.SPLIT) {
+
+                    todayCashRevenue += session.getCashAmount() == null
+                            ? 0
+                            : session.getCashAmount();
+
+                    todayUpiRevenue += session.getUpiAmount() == null
+                            ? 0
+                            : session.getUpiAmount();
                 }
 
             }
@@ -122,6 +131,7 @@ public class ReportService {
         return report;
 
     }
+
     public MonthlyReportDTO getMonthlyReport(int year, int month) {
 
         MonthlyReportDTO report = new MonthlyReportDTO();
@@ -129,56 +139,124 @@ public class ReportService {
         var sessions = gameSessionRepository.findAll();
 
         double revenue = 0;
-        int totalSessions = 0;
-        int totalCustomers = 0;
 
-        java.util.Set<Long> customerIds = new java.util.HashSet<>();
+        int totalSessions = 0;
+
+        java.util.Set<Long> customerIds =
+                new java.util.HashSet<>();
+
 
         for (GameSession session : sessions) {
+
+            // ==========================================
+            // 1. ONLY COMPLETED SESSIONS
+            // ==========================================
 
             if (!"COMPLETED".equals(session.getStatus())) {
                 continue;
             }
 
-            if (session.getEndTime() == null) {
+
+            // ==========================================
+            // 2. SESSION MUST HAVE BUSINESS DAY
+            // ==========================================
+
+            if (session.getBusinessDay() == null) {
                 continue;
             }
 
-            if (session.getEndTime().getYear() != year) {
+
+            // ==========================================
+            // 3. GET BUSINESS DATE
+            // ==========================================
+
+            LocalDate businessDate =
+                    session.getBusinessDay().getBusinessDate();
+
+            if (businessDate == null) {
                 continue;
             }
 
-            if (session.getEndTime().getMonthValue() != month) {
+
+            // ==========================================
+            // 4. FILTER USING BUSINESS DATE
+            // ==========================================
+
+            if (businessDate.getYear() != year) {
                 continue;
             }
+
+            if (businessDate.getMonthValue() != month) {
+                continue;
+            }
+
+
+            // ==========================================
+            // 5. ADD SESSION
+            // ==========================================
 
             totalSessions++;
 
-            revenue += session.getTotalAmount() == null
-                    ? 0
-                    : session.getTotalAmount();
 
-            if (session.getCustomer() != null) {
-                customerIds.add(session.getCustomer().getId());
+            // ==========================================
+            // 6. ADD TOTAL REVENUE
+            // ==========================================
+
+            double amount =
+                    session.getTotalAmount() == null
+                            ? 0
+                            : session.getTotalAmount();
+
+            revenue += amount;
+
+
+            // ==========================================
+            // 7. UNIQUE CUSTOMERS
+            // ==========================================
+
+            if (session.getCustomer() != null
+                    && session.getCustomer().getId() != null) {
+
+                customerIds.add(
+                        session.getCustomer().getId()
+                );
             }
-
         }
 
-        totalCustomers = customerIds.size();
+
+        // ==========================================
+        // 8. TOTAL CUSTOMERS
+        // ==========================================
+
+        int totalCustomers =
+                customerIds.size();
+
+
+        // ==========================================
+        // 9. AVERAGE BILL
+        // ==========================================
 
         double averageBill =
                 totalSessions == 0
                         ? 0
                         : revenue / totalSessions;
 
+
+        // ==========================================
+        // 10. SET REPORT VALUES
+        // ==========================================
+
         report.setRevenue(revenue);
+
         report.setTotalSessions(totalSessions);
+
         report.setTotalCustomers(totalCustomers);
+
         report.setAverageBill(averageBill);
+
 
         return report;
     }
-
     public ReportDTO getDailyReport(LocalDate date) {
 
         System.out.println("Daily Report Requested for : " + date);
@@ -232,6 +310,15 @@ public class ReportService {
 
                     cardRevenue += amount;
 
+                } else if (session.getPaymentMethod() == PaymentMethod.SPLIT) {
+
+                    cashRevenue += session.getCashAmount() == null
+                            ? 0
+                            : session.getCashAmount();
+
+                    upiRevenue += session.getUpiAmount() == null
+                            ? 0
+                            : session.getUpiAmount();
                 }
 
             }

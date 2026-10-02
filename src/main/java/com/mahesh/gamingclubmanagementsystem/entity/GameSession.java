@@ -34,7 +34,27 @@ public class GameSession {
     @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
 
+    private Double cashAmount = 0.0;
+
+    private Double upiAmount = 0.0;
+
     private Integer playerCount = 1;
+
+    public Double getCashAmount() {
+        return cashAmount;
+    }
+
+    public void setCashAmount(Double cashAmount) {
+        this.cashAmount = cashAmount;
+    }
+
+    public Double getUpiAmount() {
+        return upiAmount;
+    }
+
+    public void setUpiAmount(Double upiAmount) {
+        this.upiAmount = upiAmount;
+    }
 
     @ManyToOne
     @JoinColumn(name = "business_day_id")

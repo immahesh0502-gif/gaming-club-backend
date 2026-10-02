@@ -63,6 +63,52 @@ public class BusinessDayService {
 
     }
 
+    public void refreshBusinessDayTotals(BusinessDay businessDay) {
+
+        if (businessDay == null) {
+            return;
+        }
+
+        Long businessDayId = businessDay.getId();
+
+        double totalRevenue = 0.0;
+        int totalSessions = 0;
+
+        java.util.Set<Long> customerIds = new java.util.HashSet<>();
+
+        for (com.mahesh.gamingclubmanagementsystem.entity.GameSession session
+                : gameSessionRepository.findAll()) {
+
+            if (session.getBusinessDay() == null) {
+                continue;
+            }
+
+            if (!businessDayId.equals(session.getBusinessDay().getId())) {
+                continue;
+            }
+
+            if (!"COMPLETED".equals(session.getStatus())) {
+                continue;
+            }
+
+            totalSessions++;
+
+            if (session.getTotalAmount() != null) {
+                totalRevenue += session.getTotalAmount();
+            }
+
+            if (session.getCustomer() != null) {
+                customerIds.add(session.getCustomer().getId());
+            }
+        }
+
+        businessDay.setTotalRevenue(totalRevenue);
+        businessDay.setTotalSessions(totalSessions);
+        businessDay.setTotalCustomers(customerIds.size());
+
+        businessDayRepository.save(businessDay);
+    }
+
 
 
     public BusinessDayCloseResponse closeBusinessDay(){
